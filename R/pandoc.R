@@ -227,11 +227,11 @@ pandoc.image.return <- function(img, caption = storage$caption, pandoc_attribute
             pandoc_attributes <- attr(img, 'pandoc_attributes')
         }
     }
-
     ## truncating caption buffer if needed
     if (!is.null(storage$caption)) {
         storage$caption <- NULL
     }
+    
     if(pandoc_attributes=='') {
       sprintf('![%s](%s)', caption, img)
     } else {
@@ -901,9 +901,10 @@ pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), de
     } else {
         style <- match.arg(style)
     }
-    if (!missing(row.names)) {
-      if (row.names[1] == FALSE) {
+    if (row.names.provided) {
+      if (identical(row.names, FALSE)) {
         rownames(t) <- NULL
+        row.names.provided <- FALSE
       } else {
         rownames(t) <- row.names
       }
@@ -914,9 +915,9 @@ pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), de
     if (is.null(mc$justify)) {
         if (is.null(attr(t, 'alignment'))) {
             if (inherits(t, 'ftable')) {
-                justify <- get.alignment(format(t))
+                justify <- get.alignment(format(t), remove.obious.rownames = !row.names.provided)
             } else {
-                justify <- get.alignment(t)
+                justify <- get.alignment(t, remove.obious.rownames = !row.names.provided)
             }
         } else {
             justify <- attr(t, 'alignment')
@@ -1147,7 +1148,8 @@ pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), de
     t.width <-  as.numeric(apply(cbind(t.colnames.width, apply(t, 2, function(x) max(sapply(strsplit(x,'\n'), function(x) max(nchar(x, type = 'width'), 0))))), 1, max)) #nolint
 
     ## remove obvious row.names
-    if (all(t.rownames == 1:nrow(t)) | all(t.rownames == '')) {
+    if ((!row.names.provided && (all(t.rownames == 1:nrow(t)) | all(t.rownames == ''))) |
+        row.names.provided && row.names == FALSE) {
         t.rownames <- NULL
     }
 
