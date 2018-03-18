@@ -227,7 +227,7 @@ pandoc.image.return <- function(img, caption = storage$caption, pandoc_attribute
             pandoc_attributes <- attr(img, 'pandoc_attributes')
         }
     }
-  
+
     ## truncating caption buffer if needed
     if (!is.null(storage$caption)) {
         storage$caption <- NULL
@@ -639,7 +639,7 @@ pandoc.list <- function(...)
 #' x <- data.frame(a = "Can be also supplied as a vector, for each cell separately",
 #'        b = "Can be also supplied as a vector, for each cell separately")
 #' pandoc.table(x, split.cells = 10, use.hyphening = TRUE)
-pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), decimal.mark = panderOptions('decimal.mark'), big.mark = panderOptions('big.mark'), round = panderOptions('round'), missing = panderOptions('missing'), justify, style = c('multiline', 'grid', 'simple', 'rmarkdown'), split.tables = panderOptions('table.split.table'), split.cells = panderOptions('table.split.cells'), keep.trailing.zeros = panderOptions('keep.trailing.zeros'), keep.line.breaks = panderOptions('keep.line.breaks'), plain.ascii = panderOptions('plain.ascii'), use.hyphening = panderOptions('use.hyphening'), row.names, col.names, emphasize.rownames = panderOptions('table.emphasize.rownames'), emphasize.rows, emphasize.cols, emphasize.cells, emphasize.strong.rows, emphasize.strong.cols, emphasize.strong.cells, emphasize.italics.rows, emphasize.italics.cols, emphasize.italics.cells, emphasize.verbatim.rows, emphasize.verbatim.cols, emphasize.verbatim.cells, ...) { #nolint
+pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), decimal.mark = panderOptions('decimal.mark'), big.mark = panderOptions('big.mark'), round = panderOptions('round'), missing = panderOptions('missing'), justify, style = c('multiline', 'grid', 'simple', 'rmarkdown'), split.tables = panderOptions('table.split.table'), split.cells = panderOptions('table.split.cells'), keep.trailing.zeros = panderOptions('keep.trailing.zeros'), keep.line.breaks = panderOptions('keep.line.breaks'), plain.ascii = panderOptions('plain.ascii'), use.hyphening = panderOptions('use.hyphening'), row.names, col.names, emphasize.rownames = panderOptions('table.emphasize.rownames'), emphasize.rows, emphasize.cols, emphasize.cells, emphasize.strong.rows, emphasize.strong.cols, emphasize.strong.cells, emphasize.italics.rows, emphasize.italics.cols, emphasize.italics.cells, emphasize.verbatim.rows, emphasize.verbatim.cols, emphasize.verbatim.cells, pandoc_attributes, ...) { #nolint
 
     ## expands cells for output
     table.expand <- function(cells, cols.width, justify, sep.cols) {
@@ -783,6 +783,14 @@ pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), de
                 stop(paste('Too high number passed for column indexes that should be kept below', num + 1))
             }
         }
+    }
+
+    if (missing(pandoc_attributes)) {
+      if (!is.null(attr(t, 'pandoc_attributes'))) {
+        pandoc_attributes <- attr(t, 'pandoc_attributes')
+      } else {
+        pandoc_attributes<-''
+      }
     }
 
     ## #########################################################################
@@ -1329,7 +1337,7 @@ pandoc.table.return <- function(t, caption, digits = panderOptions('digits'), de
         ## (optional) caption
         check_caption(caption)
         if (!is.null(caption) && caption != '') {
-            res <- paste0(res, panderOptions('table.caption.prefix'), caption, '\n\n')
+          res <- paste0(res, panderOptions('table.caption.prefix'), caption, pandoc_attributes, '\n\n')
         }
 
         return(res)
